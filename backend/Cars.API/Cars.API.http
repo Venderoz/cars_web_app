@@ -1,1 +1,10 @@
 @Cars.API_HostAddress = http://localhost:5127
+@carId = 00000000-0000-0000-0000-000000000000
+
+### Get all cars
+GET {{Cars.API_HostAddress}}/api/cars
+Accept: application/json
+
+### Get car by id
+GET {{Cars.API_HostAddress}}/api/cars/{{carId}}
+Accept: application/json
