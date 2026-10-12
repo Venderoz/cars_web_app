@@ -8,3 +8,38 @@ Accept: application/json
 ### Get car by id
 GET {{Cars.API_HostAddress}}/api/cars/{{carId}}
 Accept: application/json
+
+### Create car
+POST {{Cars.API_HostAddress}}/api/cars
+Content-Type: application/json
+
+{
+  "brand": "Skoda",
+  "model": "Octavia",
+  "doorsNumber": 5,
+  "luggageCapacity": 640,
+  "engineCapacity": 1498,
+  "fuelType": 0,
+  "productionDate": "2024-03-15T00:00:00Z",
+  "averageFuelConsumption": 5.9,
+  "bodyType": 2
+}
+
+### Update car
+PUT {{Cars.API_HostAddress}}/api/cars/{{carId}}
+Content-Type: application/json
+
+{
+  "brand": "Skoda",
+  "model": "Octavia RS",
+  "doorsNumber": 5,
+  "luggageCapacity": 640,
+  "engineCapacity": 1984,
+  "fuelType": 0,
+  "productionDate": "2024-03-15T00:00:00Z",
+  "averageFuelConsumption": 7.2,
+  "bodyType": 2
+}
+
+### Delete car
+DELETE {{Cars.API_HostAddress}}/api/cars/{{carId}}

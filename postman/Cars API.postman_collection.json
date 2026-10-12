@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "Cars API",
+    "description": "Zapytania do Cars.API (Laboratorium 1). Uruchom API i ustaw zmienną baseUrl na adres serwera. POST zapisuje id nowego samochodu w zmiennej carId, więc kolejne zapytania działają na nim.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5127" },
+    { "key": "carId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Cars",
+      "item": [
+        {
+          "name": "GET All Cars",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars"]
+            }
+          }
+        },
+        {
+          "name": "GET Car By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "{{carId}}"]
+            }
+          }
+        },
+        {
+          "name": "POST Create Car",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"carId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Skoda\",\n  \"model\": \"Octavia\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 640,\n  \"engineCapacity\": 1498,\n  \"fuelType\": 0,\n  \"productionDate\": \"2024-03-15T00:00:00Z\",\n  \"averageFuelConsumption\": 5.9,\n  \"bodyType\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Car",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Skoda\",\n  \"model\": \"Octavia RS\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 640,\n  \"engineCapacity\": 1984,\n  \"fuelType\": 0,\n  \"productionDate\": \"2024-03-15T00:00:00Z\",\n  \"averageFuelConsumption\": 7.2,\n  \"bodyType\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "{{carId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Car",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "{{carId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
