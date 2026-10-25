@@ -1,4 +1,5 @@
 using Cars.Application.Cars;
+using Cars.API.Middleware;
 using Cars.Application.Common.Behaviors;
 using Cars.Infrastructure;
 using FluentValidation;
@@ -41,6 +42,8 @@ builder.Services.AddTransient(
     typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
+
+app.UseMiddleware<ApiExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
