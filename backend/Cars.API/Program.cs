@@ -1,3 +1,4 @@
+using Cars.Application.Cars;
 using Cars.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,11 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .WithOrigins("http://localhost:5173");
     });
+});
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(GetCarsList.Handler).Assembly);
 });
 
 var app = builder.Build();
