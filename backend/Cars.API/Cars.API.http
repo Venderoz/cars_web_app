@@ -43,3 +43,19 @@ Content-Type: application/json
 
 ### Delete car
 DELETE {{Cars.API_HostAddress}}/api/cars/{{carId}}
+
+### Create car - validation error
+POST {{Cars.API_HostAddress}}/api/cars
+Content-Type: application/json
+
+{
+  "brand": "",
+  "model": "",
+  "doorsNumber": 1,
+  "luggageCapacity": -10,
+  "engineCapacity": 0,
+  "fuelType": 1,
+  "productionDate": "2035-01-01T00:00:00Z",
+  "averageFuelConsumption": -4.5,
+  "bodyType": 1
+}

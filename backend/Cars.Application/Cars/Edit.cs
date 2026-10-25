@@ -1,5 +1,6 @@
 using Cars.Domain;
 using Cars.Infrastructure;
+using FluentValidation;
 using MediatR;
 
 namespace Cars.Application.Cars;
@@ -45,6 +46,14 @@ public class Edit
             await _context.SaveChangesAsync(cancellationToken);
 
             return true;
+        }
+    }
+
+    public class CommandValidator : AbstractValidator<Command>
+    {
+        public CommandValidator()
+        {
+            RuleFor(x => x.Car).SetValidator(new CarValidator());
         }
     }
 }
