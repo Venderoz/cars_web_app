@@ -1,21 +1,43 @@
 # Cars Web App
 
-Aplikacja webowa do zarządzania samochodami (Aplikacje webowe i sieciowe 2026/27).
+Web application for managing cars (Web and Network Applications course, 2026/27).
 
 ## Backend
 
-`backend/` — ASP.NET Core Web API (`CarsWebApplication`) z EF Core i SQLite, podział inspirowany Clean Architecture:
+`backend/` contains an ASP.NET Core Web API solution (`CarsWebApplication`) using EF Core and SQLite, split into projects inspired by Clean Architecture:
 
-- `Cars.API` — kontrolery, konfiguracja, projekt startowy,
-- `Cars.Application` — logika aplikacji,
-- `Cars.Domain` — model domenowy,
-- `Cars.Infrastructure` — EF Core, `DataContext`, migracje, dane startowe.
+- `Cars.API` – startup project: controllers, middleware, configuration,
+- `Cars.Application` – use cases: MediatR queries, commands and handlers, FluentValidation validators,
+- `Cars.Domain` – domain model (`Car`),
+- `Cars.Infrastructure` – EF Core `DataContext`, migrations, seed data.
 
-### Uruchomienie
+Requests flow: `CarsController` → MediatR → `ValidationBehavior` → handler → `DataContext` → SQLite.
+Validation errors return `400 Bad Request`, unexpected errors return `500 Internal Server Error` (`ApiExceptionMiddleware`).
+
+### Running
 
 ```bash
 cd backend
 dotnet run --project Cars.API
 ```
 
-Baza `cars.db` tworzy się automatycznie przy starcie (migracje + seed).
+The API listens on `http://localhost:5127`. The `cars.db` database is created on startup (migrations + seed data).
+Swagger UI is available at `http://localhost:5127/swagger` in the Development environment.
+
+### Endpoints
+
+| Method | URL | Result |
+|---|---|---|
+| GET | `/api/cars` | list of cars (200) |
+| GET | `/api/cars/{id}` | car details (200) or 404 |
+| POST | `/api/cars` | creates a car (201) or 400 |
+| PUT | `/api/cars/{id}` | updates a car (204), 400 or 404 |
+| DELETE | `/api/cars/{id}` | deletes a car (204) or 404 |
+
+## Postman
+
+`postman/Cars API.postman_collection.json` contains the "Cars API" collection with tests for all endpoints, including a validation error case. Import it into Postman or run it with the Postman CLI while the API is running:
+
+```bash
+postman collection run "postman/Cars API.postman_collection.json"
+```
