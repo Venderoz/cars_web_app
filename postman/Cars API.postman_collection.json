@@ -1,12 +1,18 @@
 {
   "info": {
     "name": "Cars API",
-    "description": "Zapytania do Cars.API (Laboratorium 1). Uruchom API i ustaw zmienną baseUrl na adres serwera. POST zapisuje id nowego samochodu w zmiennej carId, więc kolejne zapytania działają na nim.",
+    "description": "Requests for Cars.API (labs 1-2). Run the API and set the baseUrl variable to the server address. Run the folder in order: POST Create Car saves the new car id in the carId variable used by the next requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5127" },
-    { "key": "carId", "value": "" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5127"
+    },
+    {
+      "key": "carId",
+      "value": ""
+    }
   ],
   "item": [
     {
@@ -14,25 +20,35 @@
       "item": [
         {
           "name": "GET All Cars",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is a list\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Accept", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/cars",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "cars"]
-            }
-          }
-        },
-        {
-          "name": "GET Car By Id",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Accept", "value": "application/json" }],
-            "url": {
-              "raw": "{{baseUrl}}/api/cars/{{carId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "cars", "{{carId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars"
+              ]
             }
           }
         },
@@ -44,7 +60,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Status code is 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Location header is set\", () => pm.response.to.have.header(\"Location\"));",
                   "pm.collectionVariables.set(\"carId\", pm.response.json().id);"
                 ]
               }
@@ -52,43 +69,218 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"brand\": \"Skoda\",\n  \"model\": \"Octavia\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 640,\n  \"engineCapacity\": 1498,\n  \"fuelType\": 0,\n  \"productionDate\": \"2024-03-15T00:00:00Z\",\n  \"averageFuelConsumption\": 5.9,\n  \"bodyType\": 2\n}"
+              "raw": "{\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 470,\n  \"engineCapacity\": 1800,\n  \"fuelType\": 1,\n  \"productionDate\": \"2022-05-10T00:00:00Z\",\n  \"averageFuelConsumption\": 6.4,\n  \"bodyType\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/api/cars",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "cars"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Car By Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Returns the created car\", () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"carId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{carId}}"
+              ]
             }
           }
         },
         {
           "name": "PUT Update Car",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"brand\": \"Skoda\",\n  \"model\": \"Octavia RS\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 640,\n  \"engineCapacity\": 1984,\n  \"fuelType\": 0,\n  \"productionDate\": \"2024-03-15T00:00:00Z\",\n  \"averageFuelConsumption\": 7.2,\n  \"bodyType\": 2\n}"
+              "raw": "{\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla Hybrid\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 470,\n  \"engineCapacity\": 1800,\n  \"fuelType\": 1,\n  \"productionDate\": \"2023-04-15T00:00:00Z\",\n  \"averageFuelConsumption\": 4.8,\n  \"bodyType\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/api/cars/{{carId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "cars", "{{carId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{carId}}"
+              ]
             }
           }
         },
         {
           "name": "DELETE Car",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/cars/{{carId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "cars", "{{carId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{carId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Car By Id - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{carId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Create Car - Validation Error",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "const errors = pm.response.json().errors;",
+                  "pm.test(\"Returns validation errors\", () => {",
+                  "    pm.expect(errors[\"Car.Brand\"]).to.include(\"Brand is required.\");",
+                  "    pm.expect(errors[\"Car.DoorsNumber\"]).to.include(\"Doors number must be between 2 and 5.\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"\",\n  \"model\": \"\",\n  \"doorsNumber\": 1,\n  \"luggageCapacity\": -10,\n  \"engineCapacity\": 0,\n  \"fuelType\": 1,\n  \"productionDate\": \"2035-01-01T00:00:00Z\",\n  \"averageFuelConsumption\": -4.5,\n  \"bodyType\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars"
+              ]
             }
           }
         }
