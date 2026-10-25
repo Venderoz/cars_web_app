@@ -2,6 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cars.Domain\Cars.Domain.csproj" />
+    <ProjectReference Include="..\Cars.Infrastructure\Cars.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
 
   <PropertyGroup>
