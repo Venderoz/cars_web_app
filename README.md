@@ -41,3 +41,9 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 ```bash
 postman collection run "postman/Cars API.postman_collection.json"
 ```
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request to `main` and on every push to `main`:
+
+- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` and runs the Postman collection with the Postman CLI. If a step fails, the API log is printed.
