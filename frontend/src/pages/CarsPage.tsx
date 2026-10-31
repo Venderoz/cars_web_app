@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import CarListItem from '../components/CarListItem';
 import type { Car } from '../models/Car';
-import { getCars } from '../services/carService';
+import { deleteCar, getCars } from '../services/carService';
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -36,6 +38,26 @@ export default function CarsPage() {
     };
   }, []);
 
+  async function handleDelete(car: Car) {
+    const confirmed = window.confirm(
+      `Czy na pewno chcesz usunąć samochód ${car.brand} ${car.model}?`
+    );
+
+    if (!confirmed) return;
+
+    setDeletingId(car.id);
+    setDeleteError(null);
+
+    try {
+      await deleteCar(car.id);
+      setCars((currentCars) => currentCars.filter((item) => item.id !== car.id));
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <section>
       <div className="page-header">
@@ -53,6 +75,12 @@ export default function CarsPage() {
         </p>
       )}
 
+      {deleteError && (
+        <p className="message message-error">
+          Nie udało się usunąć samochodu. {deleteError}
+        </p>
+      )}
+
       {!isLoading && !error && cars.length === 0 && (
         <p className="message">Brak samochodów na liście.</p>
       )}
@@ -60,7 +88,12 @@ export default function CarsPage() {
       {!isLoading && !error && cars.length > 0 && (
         <ul className="car-list">
           {cars.map((car) => (
-            <CarListItem key={car.id} car={car} />
+            <CarListItem
+              key={car.id}
+              car={car}
+              isDeleting={deletingId === car.id}
+              onDelete={handleDelete}
+            />
           ))}
         </ul>
       )}

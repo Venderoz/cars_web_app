@@ -3,9 +3,11 @@ import { bodyTypeLabels, type Car } from '../models/Car';
 
 interface CarListItemProps {
   car: Car;
+  isDeleting: boolean;
+  onDelete: (car: Car) => void;
 }
 
-export default function CarListItem({ car }: CarListItemProps) {
+export default function CarListItem({ car, isDeleting, onDelete }: CarListItemProps) {
   const productionYear = new Date(car.productionDate).getFullYear();
 
   return (
@@ -24,8 +26,13 @@ export default function CarListItem({ car }: CarListItemProps) {
         <Link to={`/cars/${car.id}/edit`} className="button button-secondary">
           Edytuj
         </Link>
-        <button type="button" className="button-danger" disabled>
-          Usuń
+        <button
+          type="button"
+          className="button-danger"
+          disabled={isDeleting}
+          onClick={() => onDelete(car)}
+        >
+          {isDeleting ? 'Usuwanie...' : 'Usuń'}
         </button>
       </div>
     </li>
