@@ -227,3 +227,21 @@ button:disabled {
 .car-form-actions {
   grid-column: 1 / -1;
 }
+
+/* Search */
+
+.search {
+  display: grid;
+  gap: 0.35rem;
+  max-width: 360px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.search input {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 400;
+}
