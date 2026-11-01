@@ -36,7 +36,7 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 
 ## Frontend
 
-`frontend/` contains **Cars Client**, a React + TypeScript application built with Vite. For now it uses a local REST API served by `json-server` from `frontend/db.json`; it will be switched to `Cars.API` in a later lab.
+`frontend/` contains **Cars Client**, a React + TypeScript application built with Vite. For now it uses a local REST API served by `json-server` from `frontend/db.json` (12 sample cars); it will be switched to `Cars.API` in a later lab.
 
 ```
 frontend/src/
@@ -73,7 +73,7 @@ The app is available at `http://localhost:5173`, the data server at `http://loca
 | Path | View |
 |---|---|
 | `/` | home page |
-| `/cars` | list of cars |
+| `/cars` | list of cars with search by brand or model |
 | `/cars/new` | create car form |
 | `/cars/:id` | car details |
 | `/cars/:id/edit` | edit car form |
