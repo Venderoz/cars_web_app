@@ -40,7 +40,7 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 
 ```
 frontend/src/
-├── components/   reusable components (Navigation, CarListItem)
+├── components/   reusable components (Navigation, CarListItem, CarForm)
 ├── layouts/      shared layout with the menu and <Outlet /> (RootLayout)
 ├── models/       TypeScript types and labels (Car, NewCar, fuel and body types)
 ├── pages/        views rendered by the router

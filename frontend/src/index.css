@@ -196,3 +196,34 @@ button:disabled {
 .details dd {
   margin: 0;
 }
+
+/* Car form */
+
+.car-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.car-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.car-form input,
+.car-form select {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.car-form-actions {
+  grid-column: 1 / -1;
+}
