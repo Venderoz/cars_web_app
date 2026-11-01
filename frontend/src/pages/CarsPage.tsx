@@ -10,6 +10,12 @@ export default function CarsPage() {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState('');
+
+  const normalizedSearch = searchText.trim().toLowerCase();
+  const filteredCars = cars.filter((car) =>
+    `${car.brand} ${car.model}`.toLowerCase().includes(normalizedSearch)
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -86,16 +92,34 @@ export default function CarsPage() {
       )}
 
       {!isLoading && !error && cars.length > 0 && (
-        <ul className="car-list">
-          {cars.map((car) => (
-            <CarListItem
-              key={car.id}
-              car={car}
-              isDeleting={deletingId === car.id}
-              onDelete={handleDelete}
+        <>
+          <label className="search">
+            Szukaj po marce lub modelu
+            <input
+              type="search"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+              placeholder="np. Toyota lub Golf"
             />
-          ))}
-        </ul>
+          </label>
+
+          {filteredCars.length === 0 && (
+            <p className="message">
+              Brak samochodów pasujących do „{searchText.trim()}”.
+            </p>
+          )}
+
+          <ul className="car-list">
+            {filteredCars.map((car) => (
+              <CarListItem
+                key={car.id}
+                car={car}
+                isDeleting={deletingId === car.id}
+                onDelete={handleDelete}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </section>
   );
