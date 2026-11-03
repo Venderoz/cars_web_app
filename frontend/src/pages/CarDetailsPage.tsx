@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { bodyTypeLabels, fuelTypeLabels, type Car } from '../models/Car';
@@ -23,8 +24,8 @@ export default function CarDetailsPage() {
         const loadedCar = await getCarById(carId, controller.signal);
         setCar(loadedCar);
       } catch (err) {
-        if (controller.signal.aborted) return;
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        if (axios.isCancel(err)) return;
+        setError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -46,9 +47,7 @@ export default function CarDetailsPage() {
       {isLoading && <p className="message">Ładowanie samochodu...</p>}
 
       {error && (
-        <p className="message message-error">
-          Nie udało się pobrać samochodu. {error}
-        </p>
+        <p className="message message-error">{error}</p>
       )}
 
       {!isLoading && !error && car && (

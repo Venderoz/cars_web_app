@@ -21,7 +21,7 @@ cd backend
 dotnet run --project Cars.API
 ```
 
-The API listens on `http://localhost:5127`. The `cars.db` database is created on startup (migrations + seed data).
+The API listens on `http://localhost:5127` (profile `http`) or `https://localhost:7222` (profile `https`). The `cars.db` database is created on startup (migrations + seed data with 12 sample cars; seeding runs only when the database is empty).
 Swagger UI is available at `http://localhost:5127/swagger` in the Development environment.
 
 ### Endpoints
@@ -36,37 +36,54 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 
 ## Frontend
 
-`frontend/` contains **Cars Client**, a React + TypeScript application built with Vite. For now it uses a local REST API served by `json-server` from `frontend/db.json` (12 sample cars); it will be switched to `Cars.API` in a later lab.
+`frontend/` contains **Cars Client**, a React + TypeScript application built with Vite. It communicates with `Cars.API` using Axios.
 
 ```
 frontend/src/
+├── api/          Axios instance with base URL, timeout and logging interceptors (apiClient)
 ├── components/   reusable components (Navigation, CarListItem, CarForm)
 ├── layouts/      shared layout with the menu and <Outlet /> (RootLayout)
 ├── models/       TypeScript types and labels (Car, NewCar, fuel and body types)
 ├── pages/        views rendered by the router
-├── services/     HTTP communication with fetch (carService)
+├── services/     HTTP communication with Cars.API (carService)
 ├── App.tsx       route configuration
 └── main.tsx      entry point, BrowserRouter
 ```
 
-Libraries: React Router (`react-router`) for navigation, `json-server` as a development-only REST API. No Axios or global state store yet.
+Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests. No global state store yet.
+
+### Configuration
+
+The API address is read from `VITE_API_URL` in `frontend/.env.development`:
+
+```
+VITE_API_URL=https://localhost:7222/api
+```
+
+To use the API over HTTPS, the .NET development certificate has to be trusted once:
+
+```bash
+dotnet dev-certs https --trust
+```
+
+To use a different address locally (for example `http://localhost:5127/api`), create `frontend/.env.development.local` (ignored by git) with your own `VITE_API_URL`. Restart `npm run dev` after changing env files.
 
 ### Running
 
-Run the data server and the app in two terminals:
+Start the backend with the `https` profile, then the app:
+
+```bash
+cd backend
+dotnet run --project Cars.API --launch-profile https
+```
 
 ```bash
 cd frontend
 npm install
-npm run api
-```
-
-```bash
-cd frontend
 npm run dev
 ```
 
-The app is available at `http://localhost:5173`, the data server at `http://localhost:3000/cars`. `json-server` saves changes made in the app to `db.json`.
+The app is available at `http://localhost:5173`. CORS in `Cars.API` allows requests from this origin.
 
 ### Routes
 
