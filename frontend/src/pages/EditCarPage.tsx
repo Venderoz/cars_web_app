@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import CarForm from '../components/CarForm';
@@ -27,8 +28,8 @@ export default function EditCarPage() {
         const loadedCar = await getCarById(carId, controller.signal);
         setCar(loadedCar);
       } catch (err) {
-        if (controller.signal.aborted) return;
-        setLoadError(err instanceof Error ? err.message : 'Unknown error');
+        if (axios.isCancel(err)) return;
+        setLoadError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -53,7 +54,7 @@ export default function EditCarPage() {
       await updateCar(id, updatedCar);
       navigate(`/cars/${id}`);
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Unknown error');
+      setSaveError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
       setIsSubmitting(false);
     }
   }
@@ -66,15 +67,11 @@ export default function EditCarPage() {
       {isLoading && <p className="message">Ładowanie samochodu...</p>}
 
       {loadError && (
-        <p className="message message-error">
-          Nie udało się pobrać samochodu. {loadError}
-        </p>
+        <p className="message message-error">{loadError}</p>
       )}
 
       {saveError && (
-        <p className="message message-error">
-          Nie udało się zapisać zmian. {saveError}
-        </p>
+        <p className="message message-error">{saveError}</p>
       )}
 
       {!isLoading && !loadError && car && (

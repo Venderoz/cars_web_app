@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import CarListItem from '../components/CarListItem';
@@ -28,8 +29,8 @@ export default function CarsPage() {
         const loadedCars = await getCars(controller.signal);
         setCars(loadedCars);
       } catch (err) {
-        if (controller.signal.aborted) return;
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        if (axios.isCancel(err)) return;
+        setError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -58,7 +59,7 @@ export default function CarsPage() {
       await deleteCar(car.id);
       setCars((currentCars) => currentCars.filter((item) => item.id !== car.id));
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Unknown error');
+      setDeleteError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
     } finally {
       setDeletingId(null);
     }
@@ -76,15 +77,11 @@ export default function CarsPage() {
       {isLoading && <p className="message">Ładowanie samochodów...</p>}
 
       {error && (
-        <p className="message message-error">
-          Nie udało się pobrać samochodów. {error}
-        </p>
+        <p className="message message-error">{error}</p>
       )}
 
       {deleteError && (
-        <p className="message message-error">
-          Nie udało się usunąć samochodu. {deleteError}
-        </p>
+        <p className="message message-error">{deleteError}</p>
       )}
 
       {!isLoading && !error && cars.length === 0 && (

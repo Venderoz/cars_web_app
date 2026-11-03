@@ -29,7 +29,7 @@ export default function CreateCarPage() {
       const createdCar = await createCar(car);
       navigate(`/cars/${createdCar.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
       setIsSubmitting(false);
     }
   }
@@ -40,9 +40,7 @@ export default function CreateCarPage() {
       <h1>Dodaj samochód</h1>
 
       {error && (
-        <p className="message message-error">
-          Nie udało się dodać samochodu. {error}
-        </p>
+        <p className="message message-error">{error}</p>
       )}
 
       <CarForm
