@@ -46,11 +46,20 @@ frontend/src/
 ├── models/       TypeScript types and labels (Car, NewCar, fuel and body types)
 ├── pages/        views rendered by the router
 ├── services/     HTTP communication with Cars.API (carService)
+├── store/        Zustand store for UI state (useCarUiStore)
 ├── App.tsx       route configuration
 └── main.tsx      entry point, BrowserRouter
 ```
 
-Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests. No global state store yet.
+Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests, Zustand for shared UI state.
+
+### UI state (Zustand)
+
+`useCarUiStore` keeps state shared by several components: the search text, the "favorites only" filter and the list of favorite car ids. Server data (cars, car details) stays in component state loaded through `carService`.
+
+- Cars can be marked as favorites on the list (`CarCard`) and on the details page; the menu shows the number of favorites.
+- Deleting a car also removes its id from the favorites.
+- Only `favoriteCarIds` is persisted in `localStorage` under the `cars-ui-store` key, so favorites survive a page refresh.
 
 ### Configuration
 
