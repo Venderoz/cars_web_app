@@ -59,7 +59,8 @@ Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests
 
 - Cars can be marked as favorites with a star button (`FavoriteButton`) on the list and on the details page; the menu shows the number of favorites.
 - Deleting a car also removes its id from the favorites.
-- Only `favoriteCarIds` is persisted in `localStorage` under the `cars-ui-store` key, so favorites survive a page refresh.
+- The cars list has a search box (brand or model) and a "Tylko ulubione" (favorites only) checkbox; both filter the loaded list on the client and can be combined.
+- Only `favoriteCarIds` is persisted in `localStorage` under the `cars-ui-store` key, so favorites survive a page refresh. The search text and the favorites-only filter are kept while navigating in the app and reset after a refresh.
 
 ### Configuration
 
@@ -99,7 +100,7 @@ The app is available at `http://localhost:5173`. CORS in `Cars.API` allows reque
 | Path | View |
 |---|---|
 | `/` | home page |
-| `/cars` | list of cars with search by brand or model |
+| `/cars` | list of cars with search by brand or model and a favorites-only filter |
 | `/cars/new` | create car form |
 | `/cars/:id` | car details |
 | `/cars/:id/edit` | edit car form |
