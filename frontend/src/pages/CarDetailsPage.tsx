@@ -3,33 +3,13 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { bodyTypeLabels, fuelTypeLabels, type Car } from '../models/Car';
 import { getCarById } from '../services/carService';
-import {
-  useCarUiStore,
-} from '../store/useCarUiStore';
+import FavoriteButton from '../components/FavoriteButton';
 
 export default function CarDetailsPage() {
   const { id } = useParams();
   const [car, setCar] = useState<Car | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const favoriteCarIds =
-    useCarUiStore(
-      (state) =>
-        state.favoriteCarIds,
-    );
-
-  const toggleFavorite =
-    useCarUiStore(
-      (state) =>
-        state.toggleFavorite,
-    );
-
-  const isFavorite =
-    car !== null &&
-    favoriteCarIds.includes(
-      car.id,
-    );
 
   useEffect(() => {
     if (!id) return;
@@ -76,22 +56,7 @@ export default function CarDetailsPage() {
           <div className="page-header">
             <h1>{car.brand} {car.model}</h1>
             <div className="car-item-actions">
-              <button
-                type="button"
-                className={
-                  isFavorite
-                    ? 'favorite-button active-favorite'
-                    : 'favorite-button'
-                }
-                aria-pressed={isFavorite}
-                onClick={() =>
-                  toggleFavorite(car.id)
-                }
-              >
-                {isFavorite
-                  ? '★ Ulubiony'
-                  : '☆ Do ulubionych'}
-              </button>
+              <FavoriteButton carId={car.id} />
               <Link to={`/cars/${car.id}/edit`} className="button">
                 Edytuj
               </Link>

@@ -41,7 +41,7 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 ```
 frontend/src/
 ├── api/          Axios instance with base URL, timeout and logging interceptors (apiClient)
-├── components/   reusable components (Navigation, CarCard, CarForm)
+├── components/   reusable components (Navigation, CarCard, CarForm, FavoriteButton)
 ├── layouts/      shared layout with the menu and <Outlet /> (RootLayout)
 ├── models/       TypeScript types and labels (Car, NewCar, fuel and body types)
 ├── pages/        views rendered by the router
@@ -57,7 +57,7 @@ Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests
 
 `useCarUiStore` keeps state shared by several components: the search text, the "favorites only" filter and the list of favorite car ids. Server data (cars, car details) stays in component state loaded through `carService`.
 
-- Cars can be marked as favorites on the list (`CarCard`) and on the details page; the menu shows the number of favorites.
+- Cars can be marked as favorites with a star button (`FavoriteButton`) on the list and on the details page; the menu shows the number of favorites.
 - Deleting a car also removes its id from the favorites.
 - Only `favoriteCarIds` is persisted in `localStorage` under the `cars-ui-store` key, so favorites survive a page refresh.
 
