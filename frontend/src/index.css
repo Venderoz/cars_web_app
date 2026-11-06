@@ -245,3 +245,34 @@ button:disabled {
   font: inherit;
   font-weight: 400;
 }
+
+/* Favorites */
+
+.favorite-button {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.favorite-button:hover {
+  background-color: var(--color-background);
+}
+
+.active-favorite {
+  background-color: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.active-favorite:hover {
+  background-color: #b45309;
+}
+
+.favorite-counter {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #d97706;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
