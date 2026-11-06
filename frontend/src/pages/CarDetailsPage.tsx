@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { bodyTypeLabels, fuelTypeLabels, type Car } from '../models/Car';
 import { getCarById } from '../services/carService';
+import FavoriteButton from '../components/FavoriteButton';
 
 export default function CarDetailsPage() {
   const { id } = useParams();
@@ -54,9 +55,13 @@ export default function CarDetailsPage() {
         <>
           <div className="page-header">
             <h1>{car.brand} {car.model}</h1>
-            <Link to={`/cars/${car.id}/edit`} className="button">
-              Edytuj
-            </Link>
+            <div className="car-item-actions">
+              <p>Dodaj do ulubionych:</p>
+              <FavoriteButton carId={car.id} />
+              <Link to={`/cars/${car.id}/edit`} className="button">
+                Edytuj
+              </Link>
+            </div>
           </div>
 
           <dl className="details">

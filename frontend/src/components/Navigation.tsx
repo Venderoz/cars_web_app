@@ -1,6 +1,15 @@
 import { NavLink } from 'react-router';
+import {
+  useCarUiStore,
+} from '../store/useCarUiStore';
 
 export default function Navigation() {
+  const favoriteCount =
+    useCarUiStore(
+      (state) =>
+        state.favoriteCarIds.length,
+    );
+
   return (
     <nav className="navigation">
       <span className="navigation-brand">Cars Client</span>
@@ -13,6 +22,9 @@ export default function Navigation() {
       <NavLink to="/cars/new">
         Dodaj samochód
       </NavLink>
+      <span className="favorite-counter">
+        Ulubione: {favoriteCount}
+      </span>
     </nav>
   );
 }

@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import CarListItem from '../components/CarListItem';
+import CarCard from '../components/CarCard';
 import type { Car } from '../models/Car';
 import { deleteCar, getCars } from '../services/carService';
+import {
+  useCarUiStore,
+} from '../store/useCarUiStore';
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -12,6 +15,12 @@ export default function CarsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState('');
+
+  const removeFavorite =
+    useCarUiStore(
+      (state) =>
+        state.removeFavorite,
+    );
 
   const normalizedSearch = searchText.trim().toLowerCase();
   const filteredCars = cars.filter((car) =>
@@ -57,6 +66,9 @@ export default function CarsPage() {
 
     try {
       await deleteCar(car.id);
+
+      removeFavorite(car.id);
+
       setCars((currentCars) => currentCars.filter((item) => item.id !== car.id));
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
@@ -108,7 +120,7 @@ export default function CarsPage() {
 
           <ul className="car-list">
             {filteredCars.map((car) => (
-              <CarListItem
+              <CarCard
                 key={car.id}
                 car={car}
                 isDeleting={deletingId === car.id}

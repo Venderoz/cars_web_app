@@ -173,7 +173,13 @@ button:disabled {
 .car-item-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
+}
+
+.car-item-actions p {
+  margin: 0;
+  color: var(--color-muted);
 }
 
 /* Car details */
@@ -244,4 +250,48 @@ button:disabled {
   border-radius: 6px;
   font: inherit;
   font-weight: 400;
+}
+
+/* Favorites */
+
+.favorite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  line-height: 0;
+}
+
+.favorite-button:hover {
+  background: none;
+  color: #d97706;
+}
+
+.favorite-button svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  transition: fill 0.15s, color 0.15s;
+}
+
+.active-favorite,
+.active-favorite:hover {
+  color: #d97706;
+}
+
+.active-favorite svg {
+  fill: currentColor;
+}
+
+.favorite-counter {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #d97706;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
 }

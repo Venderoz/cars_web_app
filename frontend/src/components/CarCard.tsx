@@ -1,13 +1,14 @@
 import { Link } from 'react-router';
 import { bodyTypeLabels, type Car } from '../models/Car';
+import FavoriteButton from './FavoriteButton';
 
-interface CarListItemProps {
+interface CarCardProps {
   car: Car;
   isDeleting: boolean;
   onDelete: (car: Car) => void;
 }
 
-export default function CarListItem({ car, isDeleting, onDelete }: CarListItemProps) {
+export default function CarCard({ car, isDeleting, onDelete }: CarCardProps) {
   const productionYear = new Date(car.productionDate).getFullYear();
 
   return (
@@ -20,6 +21,7 @@ export default function CarListItem({ car, isDeleting, onDelete }: CarListItemPr
       </div>
 
       <div className="car-item-actions">
+        <FavoriteButton carId={car.id} />
         <Link to={`/cars/${car.id}`} className="button button-secondary">
           Szczegóły
         </Link>
