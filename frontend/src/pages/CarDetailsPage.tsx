@@ -56,6 +56,7 @@ export default function CarDetailsPage() {
           <div className="page-header">
             <h1>{car.brand} {car.model}</h1>
             <div className="car-item-actions">
+              <p>Dodaj do ulubionych:</p>
               <FavoriteButton carId={car.id} />
               <Link to={`/cars/${car.id}/edit`} className="button">
                 Edytuj

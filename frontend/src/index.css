@@ -173,7 +173,13 @@ button:disabled {
 .car-item-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
+}
+
+.car-item-actions p {
+  margin: 0;
+  color: var(--color-muted);
 }
 
 /* Car details */
