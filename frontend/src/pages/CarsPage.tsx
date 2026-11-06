@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import CarListItem from '../components/CarListItem';
+import CarCard from '../components/CarCard';
 import type { Car } from '../models/Car';
 import { deleteCar, getCars } from '../services/carService';
 
@@ -108,7 +108,7 @@ export default function CarsPage() {
 
           <ul className="car-list">
             {filteredCars.map((car) => (
-              <CarListItem
+              <CarCard
                 key={car.id}
                 car={car}
                 isDeleting={deletingId === car.id}

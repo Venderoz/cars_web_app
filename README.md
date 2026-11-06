@@ -41,7 +41,7 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 ```
 frontend/src/
 ├── api/          Axios instance with base URL, timeout and logging interceptors (apiClient)
-├── components/   reusable components (Navigation, CarListItem, CarForm)
+├── components/   reusable components (Navigation, CarCard, CarForm)
 ├── layouts/      shared layout with the menu and <Outlet /> (RootLayout)
 ├── models/       TypeScript types and labels (Car, NewCar, fuel and body types)
 ├── pages/        views rendered by the router

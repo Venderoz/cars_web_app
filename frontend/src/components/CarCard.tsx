@@ -1,13 +1,13 @@
 import { Link } from 'react-router';
 import { bodyTypeLabels, type Car } from '../models/Car';
 
-interface CarListItemProps {
+interface CarCardProps {
   car: Car;
   isDeleting: boolean;
   onDelete: (car: Car) => void;
 }
 
-export default function CarListItem({ car, isDeleting, onDelete }: CarListItemProps) {
+export default function CarCard({ car, isDeleting, onDelete }: CarCardProps) {
   const productionYear = new Date(car.productionDate).getFullYear();
 
   return (
