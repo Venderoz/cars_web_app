@@ -8,8 +8,12 @@ import {
 
 interface CarUiStore {
   searchTerm: string;
+
   showFavoritesOnly: boolean;
-  favoriteCarIds: string[];
+
+  // { id_użytkownika: [id_ulubione_1, id_ulubione_2, ...] }
+  favoriteCarIdsByUser:
+    Record<string, string[]>;
 
   setSearchTerm:
     (value: string) => void;
@@ -18,13 +22,19 @@ interface CarUiStore {
     (value: boolean) => void;
 
   toggleFavorite:
-    (id: string) => void;
+    (
+      userId: string,
+      carId: string,
+    ) => void;
 
   removeFavorite:
-    (id: string) => void;
+    (
+      userId: string,
+      carId: string,
+    ) => void;
 
   clearFavorites:
-    () => void;
+    (userId: string) => void;
 }
 
 export const useCarUiStore =
@@ -32,8 +42,12 @@ export const useCarUiStore =
     persist(
       (set) => ({
         searchTerm: '',
+
         showFavoritesOnly: false,
-        favoriteCarIds: [],
+
+        // Klucz = id użytkownika.
+        // Wartość = lista id jego ulubionych aut.
+        favoriteCarIdsByUser: {},
 
         setSearchTerm: (value) =>
           set({
@@ -45,38 +59,87 @@ export const useCarUiStore =
             showFavoritesOnly: value,
           }),
 
-        toggleFavorite: (id) =>
-          set((state) => ({
-            favoriteCarIds:
-              state.favoriteCarIds.includes(id)
-                ? state.favoriteCarIds.filter(
-                    (item) => item !== id,
-                  )
-                : [
-                    ...state.favoriteCarIds,
-                    id,
-                  ],
-          })),
+        toggleFavorite:
+          (
+            userId,
+            carId,
+          ) =>
+            set((state) => {
+              const current =
+                state.favoriteCarIdsByUser[
+                  userId
+                ] ?? [];
 
-        removeFavorite: (id) =>
-          set((state) => ({
-            favoriteCarIds:
-              state.favoriteCarIds.filter(
-                (item) => item !== id,
-              ),
-          })),
+              const updated =
+                current.includes(carId)
+                  ? current.filter(
+                      (id) =>
+                        id !== carId,
+                    )
+                  : [
+                      ...current,
+                      carId,
+                    ];
 
-        clearFavorites: () =>
-          set({
-            favoriteCarIds: [],
-          }),
+              return {
+                favoriteCarIdsByUser: {
+                  ...state.favoriteCarIdsByUser,
+
+                  [userId]:
+                    updated,
+                },
+              };
+            }),
+
+        removeFavorite:
+          (
+            userId,
+            carId,
+          ) =>
+            set((state) => {
+              const current =
+                state.favoriteCarIdsByUser[
+                  userId
+                ] ?? [];
+
+              return {
+                favoriteCarIdsByUser: {
+                  ...state.favoriteCarIdsByUser,
+
+                  [userId]:
+                    current.filter(
+                      (id) =>
+                        id !== carId,
+                    ),
+                },
+              };
+            }),
+
+        clearFavorites:
+          (userId) =>
+            set((state) => ({
+              favoriteCarIdsByUser: {
+                ...state.favoriteCarIdsByUser,
+
+                [userId]: [],
+              },
+            })),
       }),
+
       {
         name: 'cars-ui-store',
 
+        // Wersja 1 = ulubione per użytkownik. Stary kształt
+        // (wspólne favoriteCarIds) zastępujemy pustym obiektem.
+        version: 1,
+
+        migrate: () => ({
+          favoriteCarIdsByUser: {},
+        }),
+
         partialize: (state) => ({
-          favoriteCarIds:
-            state.favoriteCarIds,
+          favoriteCarIdsByUser:
+            state.favoriteCarIdsByUser,
         }),
       },
     ),

@@ -14,18 +14,24 @@ import {
 export default function Navigation() {
   const navigate = useNavigate();
 
-  // Liczba samochodów oznaczonych jako ulubione.
-  const favoriteCount =
-    useCarUiStore(
-      (state) =>
-        state.favoriteCarIds.length,
-    );
-
   // Aktualnie zalogowany użytkownik.
   // null oznacza brak zalogowanego użytkownika.
   const user =
     useAuthStore(
       (state) => state.user,
+    );
+
+  // Liczba ulubionych samochodów aktualnego użytkownika.
+  const favoriteCount =
+    useCarUiStore(
+      (state) =>
+        user
+          ? (
+              state.favoriteCarIdsByUser[
+                user.id
+              ] ?? []
+            ).length
+          : 0,
     );
 
   // Akcja wylogowania z magazynu Zustand.

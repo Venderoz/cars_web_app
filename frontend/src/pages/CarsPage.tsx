@@ -7,6 +7,9 @@ import { deleteCar, getCars } from '../services/carService';
 import {
   useCarUiStore,
 } from '../store/useCarUiStore';
+import {
+  useAuthStore,
+} from '../store/useAuthStore';
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -14,6 +17,12 @@ export default function CarsPage() {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // pobranie użytkownika
+  const user =
+    useAuthStore(
+      (state) => state.user,
+    );
 
   const searchTerm =
     useCarUiStore(
@@ -39,11 +48,16 @@ export default function CarsPage() {
         state.setShowFavoritesOnly,
     );
 
-  const favoriteCarIds =
+  const favoriteCarIdsByUser =
     useCarUiStore(
       (state) =>
-        state.favoriteCarIds,
+        state.favoriteCarIdsByUser,
     );
+
+  const favoriteCarIds =
+    user
+      ? favoriteCarIdsByUser[user.id] ?? []
+      : [];
 
   const removeFavorite =
     useCarUiStore(
@@ -121,7 +135,9 @@ export default function CarsPage() {
     try {
       await deleteCar(car.id);
 
-      removeFavorite(car.id);
+      if (user) {
+        removeFavorite(user.id, car.id);
+      }
 
       setCars((currentCars) => currentCars.filter((item) => item.id !== car.id));
     } catch (err) {
