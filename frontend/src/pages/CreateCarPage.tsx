@@ -36,7 +36,7 @@ export default function CreateCarPage() {
 
   return (
     <section>
-      <Link className="back-link" to="/cars">← Wróć do listy</Link>
+      <Link className="back-link" to="/cars"><span className="back-link-arrow" aria-hidden="true">←</span> Wróć do listy</Link>
       <h1>Dodaj samochód</h1>
 
       {error && (

@@ -104,11 +104,10 @@ export default function ForgotPasswordPage() {
         </button>
       </form>
 
-      <p>
-        <Link to="/login">
-          Wróć do logowania
-        </Link>
-      </p>
+      <Link to="/login" className="back-link">
+        <span className="back-link-arrow" aria-hidden="true">←</span>
+        Wróć do logowania
+      </Link>
     </section>
   );
 }

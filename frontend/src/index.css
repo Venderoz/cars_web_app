@@ -294,10 +294,40 @@ button:disabled {
 }
 
 .back-link {
-  display: inline-block;
-  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  padding: 0.35rem 0.85rem 0.35rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background-color: var(--color-surface);
+  color: var(--color-muted);
   font-size: 0.9rem;
+  font-weight: 500;
   text-decoration: none;
+  box-shadow: var(--shadow-small);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.back-link:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.back-link-arrow {
+  transition: transform 0.15s;
+}
+
+.back-link:hover .back-link-arrow {
+  transform: translateX(-3px);
+}
+
+.auth-page .back-link {
+  display: flex;
+  width: fit-content;
+  margin: 1.25rem auto 0;
 }
 
 /* Home */

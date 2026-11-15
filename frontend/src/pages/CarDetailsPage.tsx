@@ -43,7 +43,7 @@ export default function CarDetailsPage() {
 
   return (
     <section>
-      <Link to="/cars" className="back-link">← Wróć do listy</Link>
+      <Link to="/cars" className="back-link"><span className="back-link-arrow" aria-hidden="true">←</span> Wróć do listy</Link>
 
       {isLoading && <p className="message">Ładowanie samochodu...</p>}
 
