@@ -6,13 +6,38 @@ Web application for managing cars (Web and Network Applications course, 2026/27)
 
 `backend/` contains an ASP.NET Core Web API solution (`CarsWebApplication`) using EF Core and SQLite, split into projects inspired by Clean Architecture:
 
-- `Cars.API` – startup project: controllers, middleware, configuration,
+- `Cars.API` – startup project: controllers, DTOs, services (JWT, e-mail), middleware, configuration,
 - `Cars.Application` – use cases: MediatR queries, commands and handlers, FluentValidation validators,
-- `Cars.Domain` – domain model (`Car`),
-- `Cars.Infrastructure` – EF Core `DataContext`, migrations, seed data.
+- `Cars.Domain` – domain model (`Car`, `AppUser`),
+- `Cars.Infrastructure` – EF Core `DataContext` (ASP.NET Core Identity), migrations, seed data (cars, roles, admin).
 
 Requests flow: `CarsController` → MediatR → `ValidationBehavior` → handler → `DataContext` → SQLite.
 Validation errors return `400 Bad Request`, unexpected errors return `500 Internal Server Error` (`ApiExceptionMiddleware`).
+
+### Accounts and authorization
+
+User accounts use **ASP.NET Core Identity** (`AppUser`, roles `User` and `Admin`) stored in the same SQLite database. After login the API returns a **JWT**; clients send it in the `Authorization: Bearer <token>` header. All `/api/cars` endpoints require a logged-in user (`[Authorize]`), otherwise the API returns `401 Unauthorized`.
+
+- Registration creates a `User` and sends an e-mail confirmation link to the frontend (`/confirm-email`); login is allowed only after confirming the e-mail.
+- Forgot password sends a reset link (`/reset-password`); the response is the same whether the account exists or not.
+- On startup the roles and an administrator account are seeded: `admin@cars.local` / `Admin123!` (lab simplification, not for production).
+- E-mails are sent with MailKit over SMTP; for development use **Mailtrap Email Sandbox**, which captures messages instead of delivering them.
+
+### Secrets (User Secrets)
+
+The JWT signing key and SMTP credentials are not stored in `appsettings.json`. Set them once with User Secrets (in Visual Studio: right-click `Cars.API` → *Manage User Secrets*, or from the command line):
+
+```bash
+cd backend/Cars.API
+dotnet user-secrets set "Jwt:Key" "<long random key>"
+dotnet user-secrets set "Smtp:Host" "sandbox.smtp.mailtrap.io"
+dotnet user-secrets set "Smtp:Port" "2525"
+dotnet user-secrets set "Smtp:UserName" "<Mailtrap username>"
+dotnet user-secrets set "Smtp:Password" "<Mailtrap password>"
+dotnet user-secrets set "Smtp:FromEmail" "noreply@cars.local"
+```
+
+Without `Jwt:Key` the API does not start; without SMTP settings registration and forgot password fail when sending the e-mail.
 
 ### Running
 
@@ -28,11 +53,18 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 
 | Method | URL | Result |
 |---|---|---|
+| POST | `/api/account/register` | creates an account and sends a confirmation e-mail (200) or 400 |
+| GET | `/api/account/confirm-email?userId=&token=` | confirms the e-mail (200) or 400 |
+| POST | `/api/account/login` | returns the user with a JWT and roles (200) or 401 |
+| POST | `/api/account/forgot-password` | sends a reset link if the account exists (always 200) |
+| POST | `/api/account/reset-password` | sets a new password (200) or 400 |
 | GET | `/api/cars` | list of cars (200) |
 | GET | `/api/cars/{id}` | car details (200) or 404 |
 | POST | `/api/cars` | creates a car (201) or 400 |
 | PUT | `/api/cars/{id}` | updates a car (204), 400 or 404 |
 | DELETE | `/api/cars/{id}` | deletes a car (204) or 404 |
+
+All `/api/cars` endpoints return `401` without a valid JWT.
 
 ## Frontend
 
@@ -108,15 +140,21 @@ The app is available at `http://localhost:5173`. CORS in `Cars.API` allows reque
 
 ## Postman
 
-`postman/Cars API.postman_collection.json` contains the "Cars API" collection with tests for all endpoints, including a validation error case. Import it into Postman or run it with the Postman CLI while the API is running:
+`postman/Cars API.postman_collection.json` contains the "Cars API" collection with three folders:
+
+- **Account** – request without a token (401), wrong password (401), admin login (saves the JWT in `adminToken`) and forgot password with an unknown e-mail,
+- **Cars** – CRUD requests authorized with `adminToken`, including a validation error case,
+- **Account - Email (manual)** – registration, e-mail confirmation, user login and password reset; needs SMTP and the `userId`, `confirmToken` and `resetToken` variables copied from the e-mails in Mailtrap.
+
+Import it into Postman or run the automated folders with the Postman CLI while the API is running:
 
 ```bash
-postman collection run "postman/Cars API.postman_collection.json"
+postman collection run "postman/Cars API.postman_collection.json" -i Account -i Cars
 ```
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request to `main` and on every push to `main`:
 
-- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` and runs the Postman collection with the Postman CLI. If a step fails, the API log is printed.
+- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` with a random JWT key generated for the run, and runs the `Account` and `Cars` folders of the Postman collection with the Postman CLI. If a step fails, the API log is printed.
 - **frontend** – installs dependencies with `npm ci`, runs the linter (`oxlint`) and builds the app (TypeScript type check + Vite build).
