@@ -133,6 +133,8 @@ frontend/src/
 
 Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests, Zustand for shared UI state.
 
+Styling is plain CSS in `src/index.css`: design tokens (colors, radii, shadows) as CSS variables, an automatic dark theme based on the system setting (`prefers-color-scheme`), a sticky navigation bar, cars shown as a responsive card grid and a layout that adapts to phone screens.
+
 ### Accounts in the frontend
 
 - `useAuthStore` keeps the logged-in user (id, name, e-mail, JWT, roles) and is persisted in `localStorage` under `cars-auth-store`, so the user stays logged in after a refresh.
