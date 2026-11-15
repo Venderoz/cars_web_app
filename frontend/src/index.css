@@ -601,6 +601,23 @@ input[type='checkbox'] {
   padding: 0.65rem 1rem;
 }
 
+.link-button,
+.link-button:hover {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  box-shadow: none;
+}
+
+.link-button:hover {
+  color: var(--color-primary-hover);
+}
+
 /* Search and favorites filter */
 
 .cars-toolbar {
