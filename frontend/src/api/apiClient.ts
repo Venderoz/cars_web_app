@@ -40,5 +40,15 @@ apiClient.interceptors.response.use(
 
     return response;
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    // Wygasły lub nieprawidłowy JWT: usuwamy zapisanego
+    // użytkownika, a ProtectedRoute przekieruje do /login.
+    if (error.response?.status === 401) {
+      useAuthStore
+        .getState()
+        .logout();
+    }
+
+    return Promise.reject(error);
+  },
 );

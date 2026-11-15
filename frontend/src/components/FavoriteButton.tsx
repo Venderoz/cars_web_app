@@ -1,18 +1,36 @@
 import {
   useCarUiStore,
 } from '../store/useCarUiStore';
+import {
+  useAuthStore,
+} from '../store/useAuthStore';
 
 interface FavoriteButtonProps {
   carId: string;
 }
 
 export default function FavoriteButton({ carId }: FavoriteButtonProps) {
-  const isFavorite =
+  const user =
+    useAuthStore(
+      (state) => state.user,
+    );
+
+  // 1. Zustand zwraca istniejący obiekt ze store.
+  const favoriteCarIdsByUser =
     useCarUiStore(
       (state) =>
-        state.favoriteCarIds.includes(
-          carId,
-        ),
+        state.favoriteCarIdsByUser,
+    );
+
+  // 2. Dopiero zwykły kod JS wybiera tablicę użytkownika.
+  const favoriteCarIds =
+    user
+      ? favoriteCarIdsByUser[user.id] ?? []
+      : [];
+
+  const isFavorite =
+    favoriteCarIds.includes(
+      carId,
     );
 
   const toggleFavorite =
@@ -36,9 +54,11 @@ export default function FavoriteButton({ carId }: FavoriteButtonProps) {
       aria-pressed={isFavorite}
       aria-label={label}
       title={label}
-      onClick={() =>
-        toggleFavorite(carId)
-      }
+      onClick={() => {
+        if (user) {
+          toggleFavorite(user.id, carId);
+        }
+      }}
     >
       <svg
         viewBox="0 0 24 24"
