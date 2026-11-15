@@ -16,7 +16,7 @@ Validation errors return `400 Bad Request`, unexpected errors return `500 Intern
 
 ### Accounts and authorization
 
-User accounts use **ASP.NET Core Identity** (`AppUser`, roles `User` and `Admin`) stored in the same SQLite database. After login the API returns a **JWT**; clients send it in the `Authorization: Bearer <token>` header. All `/api/cars` endpoints require a logged-in user (`[Authorize]`), otherwise the API returns `401 Unauthorized`.
+User accounts use **ASP.NET Core Identity** (`AppUser`, roles `User` and `Admin`) stored in the same SQLite database. After login the API returns a **JWT**; clients send it in the `Authorization: Bearer <token>` header. All `/api/cars` endpoints require a logged-in user (`[Authorize]`), otherwise the API returns `401 Unauthorized`. A `User` can list, view, create and edit cars; only an `Admin` can delete them (`403 Forbidden` otherwise).
 
 - Registration creates a `User` and sends an e-mail confirmation link to the frontend (`/confirm-email`); login is allowed only after confirming the e-mail.
 - Forgot password sends a reset link (`/reset-password`); the response is the same whether the account exists or not.
@@ -62,9 +62,9 @@ Swagger UI is available at `http://localhost:5127/swagger` in the Development en
 | GET | `/api/cars/{id}` | car details (200) or 404 |
 | POST | `/api/cars` | creates a car (201) or 400 |
 | PUT | `/api/cars/{id}` | updates a car (204), 400 or 404 |
-| DELETE | `/api/cars/{id}` | deletes a car (204) or 404 |
+| DELETE | `/api/cars/{id}` | deletes a car (204), 403 for non-admins or 404 |
 
-All `/api/cars` endpoints return `401` without a valid JWT.
+All `/api/cars` endpoints return `401` without a valid JWT. Deleting a car additionally requires the `Admin` role (`[Authorize(Roles = "Admin")]`); a logged-in `User` gets `403 Forbidden`.
 
 ## Frontend
 
@@ -144,7 +144,7 @@ The app is available at `http://localhost:5173`. CORS in `Cars.API` allows reque
 
 - **Account** – request without a token (401), wrong password (401), admin login (saves the JWT in `adminToken`) and forgot password with an unknown e-mail,
 - **Cars** – CRUD requests authorized with `adminToken`, including a validation error case,
-- **Account - Email (manual)** – registration, e-mail confirmation, user login and password reset; needs SMTP and the `userId`, `confirmToken` and `resetToken` variables copied from the e-mails in Mailtrap.
+- **Account - Email (manual)** – registration, e-mail confirmation, user login, delete as `User` (403) and password reset; needs SMTP and the `userId`, `confirmToken` and `resetToken` variables copied from the e-mails in Mailtrap.
 
 Import it into Postman or run the automated folders with the Postman CLI while the API is running:
 

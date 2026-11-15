@@ -63,6 +63,7 @@ public class CarsController : BaseApiController
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteCar(Guid id)
     {
