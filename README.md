@@ -149,7 +149,7 @@ Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests
 
 - Cars can be marked as favorites with a star button (`FavoriteButton`) on the list and on the details page; the menu shows the number of favorites of the logged-in user.
 - Every user has an independent list of favorites; after switching accounts the stars and the counter show the favorites of the current user.
-- Deleting a car also removes its id from the current user's favorites.
+- Deleting a car removes its id from the favorites of every user stored in the browser, and loading the cars list drops favorites of cars that no longer exist (for example deleted by an admin in another browser), so the counter always matches existing cars.
 - The cars list has a search box (brand or model) and a "Tylko ulubione" (favorites only) checkbox; both filter the loaded list on the client and can be combined.
 - Only `favoriteCarIdsByUser` is persisted in `localStorage` under the `cars-ui-store` key (store version 1; data saved in the old single-list format is replaced with an empty object), so favorites survive a page refresh and logging out. The search text and the favorites-only filter are kept while navigating in the app and reset after a refresh.
 
