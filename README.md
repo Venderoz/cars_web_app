@@ -89,6 +89,7 @@ Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests
 
 - `useAuthStore` keeps the logged-in user (id, name, e-mail, JWT, roles) and is persisted in `localStorage` under `cars-auth-store`, so the user stays logged in after a refresh.
 - A request interceptor in `apiClient` adds `Authorization: Bearer <token>` to every request when a user is logged in.
+- A response interceptor logs the user out when the API returns `401 Unauthorized` (for example an expired or invalid JWT); `ProtectedRoute` then redirects to `/login`.
 - `ProtectedRoute` guards all `/cars` routes and redirects to `/login` when nobody is logged in.
 - The menu shows *Logowanie* / *Rejestracja* for guests and the cars links, favorites counter, user name with roles and *Wyloguj* for logged-in users.
 - The delete button is shown only to users with the `Admin` role. This only adjusts the UI; the backend enforces the permission.
@@ -96,12 +97,13 @@ Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests
 
 ### UI state (Zustand)
 
-`useCarUiStore` keeps state shared by several components: the search text, the "favorites only" filter and the list of favorite car ids. Server data (cars, car details) stays in component state loaded through `carService`.
+`useCarUiStore` keeps state shared by several components: the search text, the "favorites only" filter and the favorite car ids of each user (`favoriteCarIdsByUser`, keyed by user id). Server data (cars, car details) stays in component state loaded through `carService`.
 
-- Cars can be marked as favorites with a star button (`FavoriteButton`) on the list and on the details page; the menu shows the number of favorites.
-- Deleting a car also removes its id from the favorites.
+- Cars can be marked as favorites with a star button (`FavoriteButton`) on the list and on the details page; the menu shows the number of favorites of the logged-in user.
+- Every user has an independent list of favorites; after switching accounts the stars and the counter show the favorites of the current user.
+- Deleting a car also removes its id from the current user's favorites.
 - The cars list has a search box (brand or model) and a "Tylko ulubione" (favorites only) checkbox; both filter the loaded list on the client and can be combined.
-- Only `favoriteCarIds` is persisted in `localStorage` under the `cars-ui-store` key, so favorites survive a page refresh. The search text and the favorites-only filter are kept while navigating in the app and reset after a refresh.
+- Only `favoriteCarIdsByUser` is persisted in `localStorage` under the `cars-ui-store` key (store version 1; data saved in the old single-list format is replaced with an empty object), so favorites survive a page refresh and logging out. The search text and the favorites-only filter are kept while navigating in the app and reset after a refresh.
 
 ### Configuration
 
