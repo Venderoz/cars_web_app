@@ -61,7 +61,7 @@ export default function EditCarPage() {
 
   return (
     <section>
-      <Link to={id ? `/cars/${id}` : '/cars'}>← Wróć do szczegółów</Link>
+      <Link className="back-link" to={id ? `/cars/${id}` : '/cars'}><span className="back-link-arrow" aria-hidden="true">←</span> Wróć do szczegółów</Link>
       <h1>Edytuj samochód</h1>
 
       {isLoading && <p className="message">Ładowanie samochodu...</p>}

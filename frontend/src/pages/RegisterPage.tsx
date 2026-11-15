@@ -6,6 +6,7 @@ import {
 
 import {
   Link,
+  useNavigate,
 } from 'react-router';
 
 import type {
@@ -23,11 +24,10 @@ const emptyForm: RegisterData = {
 };
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] =
     useState<RegisterData>(emptyForm);
-
-  const [message, setMessage] =
-    useState<string | null>(null);
 
   const [error, setError] =
     useState<string | null>(null);
@@ -56,8 +56,14 @@ export default function RegisterPage() {
       const result =
         await register(formData);
 
-      setMessage(result);
-      setFormData(emptyForm);
+      // Po rejestracji od razu przechodzimy do logowania
+      // z informacją o mailu aktywacyjnym i wpisanym e-mailem.
+      navigate('/login', {
+        state: {
+          message: result,
+          email: formData.email,
+        },
+      });
     }
     catch (caughtError) {
       if (caughtError instanceof Error) {
@@ -75,14 +81,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Rejestracja</h1>
-
-      {message && (
-        <p className="message">
-          {message}
-        </p>
-      )}
 
       {error && (
         <p className="error-message">

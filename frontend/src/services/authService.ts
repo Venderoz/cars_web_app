@@ -95,6 +95,28 @@ export async function confirmEmail(
   return response.data.message;
 }
 
+export async function resendConfirmation(
+  email: string,
+): Promise<string> {
+  try {
+    const response =
+      await apiClient.post<{
+        message: string;
+      }>(
+        '/account/resend-confirmation',
+        { email },
+      );
+
+    return response.data.message;
+  }
+  catch (error) {
+    throw new Error(
+      getErrorMessage(error, 'Nie udało się wysłać wiadomości.'),
+      { cause: error },
+    );
+  }
+}
+
 export async function forgotPassword(
   email: string,
 ): Promise<string> {

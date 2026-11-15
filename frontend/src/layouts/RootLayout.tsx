@@ -8,6 +8,9 @@ export default function RootLayout() {
       <main className="content">
         <Outlet />
       </main>
+      <footer className="footer">
+        Cars · Aplikacje webowe i sieciowe 2026/27
+      </footer>
     </>
   );
 }

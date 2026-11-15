@@ -43,7 +43,7 @@ export default function CarDetailsPage() {
 
   return (
     <section>
-      <Link to="/cars">← Wróć do listy</Link>
+      <Link to="/cars" className="back-link"><span className="back-link-arrow" aria-hidden="true">←</span> Wróć do listy</Link>
 
       {isLoading && <p className="message">Ładowanie samochodu...</p>}
 
@@ -65,32 +65,42 @@ export default function CarDetailsPage() {
           </div>
 
           <dl className="details">
-            <dt>Marka</dt>
-            <dd>{car.brand}</dd>
-
-            <dt>Model</dt>
-            <dd>{car.model}</dd>
-
-            <dt>Liczba drzwi</dt>
-            <dd>{car.doorsNumber}</dd>
-
-            <dt>Pojemność bagażnika</dt>
-            <dd>{car.luggageCapacity} l</dd>
-
-            <dt>Pojemność silnika</dt>
-            <dd>{car.engineCapacity} cm³</dd>
-
-            <dt>Rodzaj paliwa</dt>
-            <dd>{fuelTypeLabels[car.fuelType]}</dd>
-
-            <dt>Data produkcji</dt>
-            <dd>{new Date(car.productionDate).toLocaleDateString('pl-PL')}</dd>
-
-            <dt>Średnie spalanie</dt>
-            <dd>{car.averageFuelConsumption} l/100 km</dd>
-
-            <dt>Typ nadwozia</dt>
-            <dd>{bodyTypeLabels[car.bodyType]}</dd>
+            <div className="details-item">
+              <dt>Marka</dt>
+              <dd>{car.brand}</dd>
+            </div>
+            <div className="details-item">
+              <dt>Model</dt>
+              <dd>{car.model}</dd>
+            </div>
+            <div className="details-item">
+              <dt>Liczba drzwi</dt>
+              <dd>{car.doorsNumber}</dd>
+            </div>
+            <div className="details-item">
+              <dt>Pojemność bagażnika</dt>
+              <dd>{car.luggageCapacity} l</dd>
+            </div>
+            <div className="details-item">
+              <dt>Pojemność silnika</dt>
+              <dd>{car.engineCapacity} cm³</dd>
+            </div>
+            <div className="details-item">
+              <dt>Rodzaj paliwa</dt>
+              <dd>{fuelTypeLabels[car.fuelType]}</dd>
+            </div>
+            <div className="details-item">
+              <dt>Data produkcji</dt>
+              <dd>{new Date(car.productionDate).toLocaleDateString('pl-PL')}</dd>
+            </div>
+            <div className="details-item">
+              <dt>Średnie spalanie</dt>
+              <dd>{car.averageFuelConsumption} l/100 km</dd>
+            </div>
+            <div className="details-item">
+              <dt>Typ nadwozia</dt>
+              <dd>{bodyTypeLabels[car.bodyType]}</dd>
+            </div>
           </dl>
         </>
       )}

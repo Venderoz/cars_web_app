@@ -104,6 +104,7 @@ The `cars.db` database is created on startup (migrations + seed data with 12 sam
 | POST | `/api/account/register` | creates an account and sends a confirmation e-mail (200) or 400 |
 | GET | `/api/account/confirm-email?userId=&token=` | confirms the e-mail (200) or 400 |
 | POST | `/api/account/login` | returns the user with a JWT and roles (200) or 401 |
+| POST | `/api/account/resend-confirmation` | sends a new confirmation link if the account exists and is not confirmed (always 200) |
 | POST | `/api/account/forgot-password` | sends a reset link if the account exists (always 200) |
 | POST | `/api/account/reset-password` | sets a new password (200) or 400 |
 | GET | `/api/cars` | list of cars (200) |
@@ -121,6 +122,7 @@ All `/api/cars` endpoints return `401` without a valid JWT. Deleting a car addit
 ```
 frontend/src/
 ├── api/          Axios instance with base URL, timeout, logging and JWT interceptors (apiClient)
+├── hooks/        reusable hooks (useRedirectCountdown)
 ├── components/   reusable components (Navigation, CarCard, CarForm, FavoriteButton, ProtectedRoute)
 ├── layouts/      shared layout with the menu and <Outlet /> (RootLayout)
 ├── models/       TypeScript types and labels (Car, NewCar, fuel and body types; User, LoginData, RegisterData)
@@ -133,6 +135,8 @@ frontend/src/
 
 Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests, Zustand for shared UI state.
 
+Styling is plain CSS in `src/index.css`: design tokens (colors, radii, shadows) as CSS variables, an automatic dark theme based on the system setting (`prefers-color-scheme`), a sticky navigation bar, cars shown as a responsive card grid and a layout that adapts to phone screens.
+
 ### Accounts in the frontend
 
 - `useAuthStore` keeps the logged-in user (id, name, e-mail, JWT, roles) and is persisted in `localStorage` under `cars-auth-store`, so the user stays logged in after a refresh.
@@ -141,7 +145,8 @@ Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests
 - `ProtectedRoute` guards all `/cars` routes and redirects to `/login` when nobody is logged in.
 - The menu shows *Logowanie* / *Rejestracja* for guests and the cars links, favorites counter, user name with roles and *Wyloguj* for logged-in users.
 - The delete button is shown only to users with the `Admin` role. This only adjusts the UI; the backend enforces the permission.
-- `/confirm-email` and `/reset-password` are the pages opened from the e-mail links sent by the backend.
+- `/confirm-email` and `/reset-password` are the pages opened from the e-mail links sent by the backend. After a successful confirmation or password change they count down 3 seconds and redirect to `/login` (`useRedirectCountdown`) with a message; after a password change the e-mail is filled in.
+- After registration the app goes straight to `/login` with the "check your e-mail" message and the e-mail filled in. If login fails because the e-mail is not confirmed, the login page offers to send the activation link again.
 
 ### UI state (Zustand)
 

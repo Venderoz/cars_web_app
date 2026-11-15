@@ -60,6 +60,35 @@ public class AccountController : BaseApiController
 
         await _userManager.AddToRoleAsync(user, "User");
 
+        await SendConfirmationEmailAsync(user);
+
+        return Ok(new
+        {
+            message =
+                "Konto utworzono. Sprawdź e-mail i potwierdź rejestrację.",
+        });
+    }
+
+    [HttpPost("resend-confirmation")]
+    public async Task<ActionResult> ResendConfirmation(ResendConfirmationDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(
+            dto.Email.Trim());
+
+        if (user is not null && !user.EmailConfirmed)
+        {
+            await SendConfirmationEmailAsync(user);
+        }
+
+        return Ok(new
+        {
+            message =
+                "Jeżeli konto istnieje i nie jest potwierdzone, wysłaliśmy nowy link aktywacyjny.",
+        });
+    }
+
+    private async Task SendConfirmationEmailAsync(AppUser user)
+    {
         var token = await _userManager
             .GenerateEmailConfirmationTokenAsync(user);
 
@@ -84,12 +113,6 @@ public class AccountController : BaseApiController
             Potwierdź adres e-mail
             </a></p>
             """);
-
-        return Ok(new
-        {
-            message =
-                "Konto utworzono. Sprawdź e-mail i potwierdź rejestrację.",
-        });
     }
 
     [HttpGet("confirm-email")]

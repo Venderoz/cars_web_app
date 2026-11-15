@@ -6,12 +6,18 @@ import {
 
 import {
   Link,
+  useLocation,
   useNavigate,
 } from 'react-router';
 
 import {
   login,
+  resendConfirmation,
 } from '../services/authService';
+
+import type {
+  LoginPageState,
+} from '../hooks/useRedirectCountdown';
 
 import {
   useAuthStore,
@@ -25,8 +31,14 @@ export default function LoginPage() {
       (state) => state.setUser,
     );
 
+  // Komunikat i e-mail przekazane z rejestracji, potwierdzenia
+  // konta albo zmiany hasła.
+  const location = useLocation();
+  const redirectState =
+    location.state as LoginPageState | null;
+
   const [email, setEmail] =
-    useState('');
+    useState(redirectState?.email ?? '');
 
   const [password, setPassword] =
     useState('');
@@ -36,6 +48,37 @@ export default function LoginPage() {
 
   const [isSubmitting, setIsSubmitting] =
     useState(false);
+
+  const [info, setInfo] =
+    useState<string | null>(redirectState?.message ?? null);
+
+  const [isResending, setIsResending] =
+    useState(false);
+
+  const emailNotConfirmed =
+    error?.includes('potwierdź adres e-mail') ?? false;
+
+  async function handleResend() {
+    try {
+      setIsResending(true);
+
+      const result =
+        await resendConfirmation(email);
+
+      setError(null);
+      setInfo(result);
+    }
+    catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Nie udało się wysłać wiadomości.',
+      );
+    }
+    finally {
+      setIsResending(false);
+    }
+  }
 
   function handleEmailChange(
     event: ChangeEvent<HTMLInputElement>,
@@ -57,6 +100,7 @@ export default function LoginPage() {
     try {
       setIsSubmitting(true);
       setError(null);
+      setInfo(null);
 
       const user =
         await login({
@@ -84,12 +128,34 @@ export default function LoginPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Logowanie</h1>
+
+      {info && (
+        <p className="message">
+          {info}
+        </p>
+      )}
 
       {error && (
         <p className="error-message">
           {error}
+        </p>
+      )}
+
+      {emailNotConfirmed && (
+        <p>
+          Nie dostałeś wiadomości?{' '}
+          <button
+            type="button"
+            className="link-button"
+            disabled={isResending || !email}
+            onClick={handleResend}
+          >
+            {isResending
+              ? 'Wysyłanie...'
+              : 'Wyślij link aktywacyjny ponownie'}
+          </button>
         </p>
       )}
 
@@ -105,6 +171,7 @@ export default function LoginPage() {
             value={email}
             onChange={handleEmailChange}
             required
+            autoComplete="email"
           />
         </label>
 
@@ -116,6 +183,7 @@ export default function LoginPage() {
             value={password}
             onChange={handlePasswordChange}
             required
+            autoComplete="current-password"
           />
         </label>
 

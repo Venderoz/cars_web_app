@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { bodyTypeLabels, type Car } from '../models/Car';
+import { bodyTypeLabels, fuelTypeLabels, type Car } from '../models/Car';
 import FavoriteButton from './FavoriteButton';
 import {
   useAuthStore,
@@ -27,15 +27,19 @@ export default function CarCard({ car, isDeleting, onDelete }: CarCardProps) {
 
   return (
     <li className="car-item">
-      <div>
-        <strong>{car.brand} {car.model}</strong>
-        <div className="car-item-meta">
-          {productionYear} · {bodyTypeLabels[car.bodyType]}
-        </div>
+      <div className="car-item-header">
+        <strong className="car-item-title">{car.brand} {car.model}</strong>
+        <FavoriteButton carId={car.id} />
       </div>
 
+      <ul className="car-item-meta">
+        <li>{productionYear}</li>
+        <li>{bodyTypeLabels[car.bodyType]}</li>
+        <li>{fuelTypeLabels[car.fuelType]}</li>
+        <li>{car.engineCapacity} cm³</li>
+      </ul>
+
       <div className="car-item-actions">
-        <FavoriteButton carId={car.id} />
         <Link to={`/cars/${car.id}`} className="button button-secondary">
           Szczegóły
         </Link>
