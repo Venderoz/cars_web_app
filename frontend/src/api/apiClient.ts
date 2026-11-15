@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+import {
+  useAuthStore,
+} from '../store/useAuthStore';
+
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
@@ -11,6 +15,14 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
+    const user =
+      useAuthStore.getState().user;
+
+    if (user?.token) {
+      config.headers.Authorization =
+        `Bearer ${user.token}`;
+    }
+
     console.log(
       `[Axios] ${config.method?.toUpperCase()} ${config.url}`,
     );

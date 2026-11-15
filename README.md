@@ -72,18 +72,27 @@ All `/api/cars` endpoints return `401` without a valid JWT. Deleting a car addit
 
 ```
 frontend/src/
-├── api/          Axios instance with base URL, timeout and logging interceptors (apiClient)
-├── components/   reusable components (Navigation, CarCard, CarForm, FavoriteButton)
+├── api/          Axios instance with base URL, timeout, logging and JWT interceptors (apiClient)
+├── components/   reusable components (Navigation, CarCard, CarForm, FavoriteButton, ProtectedRoute)
 ├── layouts/      shared layout with the menu and <Outlet /> (RootLayout)
-├── models/       TypeScript types and labels (Car, NewCar, fuel and body types)
+├── models/       TypeScript types and labels (Car, NewCar, fuel and body types; User, LoginData, RegisterData)
 ├── pages/        views rendered by the router
-├── services/     HTTP communication with Cars.API (carService)
-├── store/        Zustand store for UI state (useCarUiStore)
+├── services/     HTTP communication with Cars.API (carService, authService)
+├── store/        Zustand stores (useCarUiStore for UI state, useAuthStore for the logged-in user)
 ├── App.tsx       route configuration
 └── main.tsx      entry point, BrowserRouter
 ```
 
 Libraries: React Router (`react-router`) for navigation, Axios for HTTP requests, Zustand for shared UI state.
+
+### Accounts in the frontend
+
+- `useAuthStore` keeps the logged-in user (id, name, e-mail, JWT, roles) and is persisted in `localStorage` under `cars-auth-store`, so the user stays logged in after a refresh.
+- A request interceptor in `apiClient` adds `Authorization: Bearer <token>` to every request when a user is logged in.
+- `ProtectedRoute` guards all `/cars` routes and redirects to `/login` when nobody is logged in.
+- The menu shows *Logowanie* / *Rejestracja* for guests and the cars links, favorites counter, user name with roles and *Wyloguj* for logged-in users.
+- The delete button is shown only to users with the `Admin` role. This only adjusts the UI; the backend enforces the permission.
+- `/confirm-email` and `/reset-password` are the pages opened from the e-mail links sent by the backend.
 
 ### UI state (Zustand)
 
@@ -132,11 +141,19 @@ The app is available at `http://localhost:5173`. CORS in `Cars.API` allows reque
 | Path | View |
 |---|---|
 | `/` | home page |
+| `/about` | about the application |
+| `/login` | login form |
+| `/register` | registration form |
+| `/confirm-email` | e-mail confirmation (link from the e-mail) |
+| `/forgot-password` | request a password reset link |
+| `/reset-password` | set a new password (link from the e-mail) |
 | `/cars` | list of cars with search by brand or model and a favorites-only filter |
 | `/cars/new` | create car form |
 | `/cars/:id` | car details |
 | `/cars/:id/edit` | edit car form |
 | `*` | not found page |
+
+All `/cars` routes require a logged-in user.
 
 ## Postman
 
