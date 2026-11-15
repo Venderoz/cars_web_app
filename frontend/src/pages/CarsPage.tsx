@@ -59,11 +59,19 @@ export default function CarsPage() {
       ? favoriteCarIdsByUser[user.id] ?? []
       : [];
 
-  const removeFavorite =
+  const removeCarFromFavorites =
     useCarUiStore(
       (state) =>
-        state.removeFavorite,
+        state.removeCarFromFavorites,
     );
+
+  const syncFavorites =
+    useCarUiStore(
+      (state) =>
+        state.syncFavorites,
+    );
+
+  const userId = user?.id;
 
   const normalizedSearch =
     searchTerm
@@ -105,6 +113,15 @@ export default function CarsPage() {
       try {
         const loadedCars = await getCars(controller.signal);
         setCars(loadedCars);
+
+        // Auta usunięte w międzyczasie (np. przez administratora)
+        // znikają z ulubionych zalogowanego użytkownika.
+        if (userId) {
+          syncFavorites(
+            userId,
+            loadedCars.map((car) => car.id),
+          );
+        }
       } catch (err) {
         if (axios.isCancel(err)) return;
         setError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd.');
@@ -120,7 +137,7 @@ export default function CarsPage() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [userId, syncFavorites]);
 
   async function handleDelete(car: Car) {
     const confirmed = window.confirm(
@@ -135,9 +152,8 @@ export default function CarsPage() {
     try {
       await deleteCar(car.id);
 
-      if (user) {
-        removeFavorite(user.id, car.id);
-      }
+      // Usunięte auto znika z ulubionych wszystkich użytkowników.
+      removeCarFromFavorites(car.id);
 
       setCars((currentCars) => currentCars.filter((item) => item.id !== car.id));
     } catch (err) {
