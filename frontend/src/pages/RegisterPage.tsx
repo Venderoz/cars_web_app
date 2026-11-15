@@ -75,7 +75,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Rejestracja</h1>
 
       {message && (

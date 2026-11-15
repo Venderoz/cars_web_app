@@ -84,7 +84,7 @@ export default function LoginPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Logowanie</h1>
 
       {error && (

@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Nie pamiętasz hasła?</h1>
 
       <p>

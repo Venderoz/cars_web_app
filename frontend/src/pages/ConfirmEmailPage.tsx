@@ -64,7 +64,7 @@ export default function ConfirmEmailPage() {
 
   if (!userId || !token) {
     return (
-      <section>
+      <section className="auth-page">
         <h1>Nieprawidłowy link</h1>
         <Link to="/login">
           Przejdź do logowania
@@ -74,7 +74,7 @@ export default function ConfirmEmailPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Potwierdzenie konta</h1>
       <p>{message}</p>
       <Link to="/login">

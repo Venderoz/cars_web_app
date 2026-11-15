@@ -80,7 +80,7 @@ export default function ResetPasswordPage() {
 
   if (!email || !token) {
     return (
-      <section>
+      <section className="auth-page">
         <h1>Nieprawidłowy link</h1>
         <Link to="/login">
           Wróć do logowania
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>Ustaw nowe hasło</h1>
 
       {message && (
