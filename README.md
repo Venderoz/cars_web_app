@@ -41,13 +41,61 @@ Without `Jwt:Key` the API does not start; without SMTP settings registration and
 
 ### Running
 
+The launch profiles in `Cars.API/Properties/launchSettings.json`:
+
+| Profile | Addresses | Swagger UI |
+|---|---|---|
+| `http` (default) | `http://localhost:5127` | `http://localhost:5127/swagger` |
+| `https` | `https://localhost:7222` and `http://localhost:5127` | `https://localhost:7222/swagger` |
+
+The frontend uses `https://localhost:7222/api` (see `frontend/.env.development`), so run the backend with the **`https`** profile.
+
+#### HTTPS (recommended)
+
+1. Trust the .NET development certificate once (confirm the system dialog):
+
+   ```bash
+   dotnet dev-certs https --trust
+   ```
+
+   Check it with `dotnet dev-certs https --check --trust`.
+
+2. Start the API with the `https` profile:
+
+   ```bash
+   cd backend
+   dotnet run --project Cars.API --launch-profile https
+   ```
+
+   In **Visual Studio** select the `https` profile in the drop-down next to the green Start button (with `Cars.API` as the startup project) and press F5. Do not type commands into *Debug properties → Command line arguments*; that field passes arguments to the application, not commands.
+
+3. The console should show both addresses:
+
+   ```
+   Now listening on: https://localhost:7222
+   Now listening on: http://localhost:5127
+   ```
+
+   Open `https://localhost:7222/api/cars` or `https://localhost:7222/swagger` in the browser to check it. If the browser still warns about the certificate, open the address once and accept it, or restart the browser after trusting the certificate.
+
+With the `https` profile, requests to `http://localhost:5127` are redirected to HTTPS (`UseHttpsRedirection`).
+
+#### HTTP only
+
 ```bash
 cd backend
-dotnet run --project Cars.API
+dotnet run --project Cars.API --launch-profile http
 ```
 
-The API listens on `http://localhost:5127` (profile `http`) or `https://localhost:7222` (profile `https`). The `cars.db` database is created on startup (migrations + seed data with 12 sample cars; seeding runs only when the database is empty).
-Swagger UI is available at `http://localhost:5127/swagger` in the Development environment.
+The frontend then needs `frontend/.env.development.local` with `VITE_API_URL=http://localhost:5127/api` (restart `npm run dev` after creating it).
+
+#### Troubleshooting
+
+- *Brak odpowiedzi z serwera* in the frontend: the API is not listening on the address from `VITE_API_URL` (for example it was started with the `http` profile) or the certificate is not trusted.
+- The API listens on `http://localhost:5000`: it was started without a launch profile; use `--launch-profile https` or select the profile in Visual Studio.
+- The API does not start with `Brak Jwt:Key.`: set the User Secrets described above.
+
+The `cars.db` database is created on startup (migrations + seed data with 12 sample cars, roles and the admin account; cars are seeded only when the database is empty).
 
 ### Endpoints
 
