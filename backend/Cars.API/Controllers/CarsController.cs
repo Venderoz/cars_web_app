@@ -10,12 +10,31 @@ namespace Cars.API.Controllers;
 [Authorize]
 public class CarsController : BaseApiController
 {
-    private readonly ISender _sender;
+    private const long MaxPhotoSize = 5_000_000;
 
-    public CarsController(ISender sender)
+    private static readonly string[] AllowedExtensions =
+    [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+    ];
+
+    private readonly ISender _sender;
+    private readonly IWebHostEnvironment _environment;
+
+    public CarsController(ISender sender, IWebHostEnvironment environment)
     {
         _sender = sender;
+        _environment = environment;
     }
+
+    private string UploadDirectory =>
+        Path.Combine(
+            _environment.WebRootPath
+                ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+            "uploads",
+            "cars");
 
     [HttpGet]
     public async Task<ActionResult<List<CarDto>>> GetCars()
@@ -92,6 +111,89 @@ public class CarsController : BaseApiController
         if (!result)
         {
             return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("{id:guid}/photos")]
+    [RequestSizeLimit(MaxPhotoSize + 100_000)]
+    public async Task<ActionResult<CarPhotoDto>>
+        UploadPhoto(Guid id, IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file is null || file.Length == 0)
+        {
+            return BadRequest("Nie przesłano pliku.");
+        }
+
+        if (file.Length > MaxPhotoSize)
+        {
+            return BadRequest("Plik jest za duży. Maksymalny rozmiar to 5 MB.");
+        }
+
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+        if (!AllowedExtensions.Contains(extension)
+            || !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Dozwolone są tylko pliki JPG, JPEG, PNG i WebP.");
+        }
+
+        // Nazwa pliku od użytkownika nie trafia na dysk – generujemy własną.
+        var fileName = $"{Guid.NewGuid()}{extension}";
+
+        Directory.CreateDirectory(UploadDirectory);
+
+        var filePath = Path.Combine(UploadDirectory, fileName);
+
+        await using (var stream = System.IO.File.Create(filePath))
+        {
+            await file.CopyToAsync(stream, cancellationToken);
+        }
+
+        var url = $"{Request.Scheme}://{Request.Host}/uploads/cars/{fileName}";
+
+        var result = await _sender.Send(new AddCarPhoto.Command
+            {
+                CarId = id,
+                FileName = fileName,
+                Url = url,
+            },
+            cancellationToken);
+
+        if (result is null)
+        {
+            System.IO.File.Delete(filePath);
+
+            return NotFound();
+        }
+
+        return CreatedAtAction(nameof(GetCar), new { id }, result);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id:guid}/photos/{photoId:guid}")]
+    public async Task<IActionResult> DeletePhoto(Guid id, Guid photoId, CancellationToken cancellationToken)
+    {
+        var fileName = await _sender.Send(
+                new DeleteCarPhoto.Command
+                {
+                    CarId = id,
+                    PhotoId = photoId,
+                },
+                cancellationToken);
+
+        if (fileName is null)
+        {
+            return NotFound();
+        }
+
+        var filePath = Path.Combine(UploadDirectory, fileName);
+
+        if (System.IO.File.Exists(filePath))
+        {
+            System.IO.File.Delete(filePath);
         }
 
         return NoContent();
