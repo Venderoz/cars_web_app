@@ -8,8 +8,15 @@ Web application for managing cars (Web and Network Applications course, 2026/27)
 
 - `Cars.API` – startup project: controllers, DTOs, services (JWT, e-mail), middleware, configuration,
 - `Cars.Application` – use cases: MediatR queries, commands and handlers, FluentValidation validators,
-- `Cars.Domain` – domain model (`Car`, `AppUser`),
-- `Cars.Infrastructure` – EF Core `DataContext` (ASP.NET Core Identity), migrations, seed data (cars, roles, admin).
+- `Cars.Domain` – domain model (`Car`, `CarPhoto`, `Feature`, `AppUser`),
+- `Cars.Infrastructure` – EF Core `DataContext` (ASP.NET Core Identity), migrations, seed data (cars, features, roles, admin).
+
+Relations in the data model:
+
+- **1:N** `Car` → `CarPhoto` – a car has many photos (`CarPhoto.CarId` is the foreign key, table `CarPhotos`),
+- **N:M** `Car` ↔ `Feature` – a car has many features (ABS, ESP, air conditioning…) and a feature belongs to many cars; EF Core creates the join table `CarFeatures` without an explicit join entity (configured in `DataContext.OnModelCreating`).
+
+Feature seed data (8 items) is added on startup only when the `Features` table is empty.
 
 Requests flow: `CarsController` → MediatR → `ValidationBehavior` → handler → `DataContext` → SQLite.
 Validation errors return `400 Bad Request`, unexpected errors return `500 Internal Server Error` (`ApiExceptionMiddleware`).
