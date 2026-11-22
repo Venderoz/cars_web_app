@@ -116,10 +116,12 @@ The `cars.db` database is created on startup (migrations + seed data with 12 sam
 | POST | `/api/account/resend-confirmation` | sends a new confirmation link if the account exists and is not confirmed (always 200) |
 | POST | `/api/account/forgot-password` | sends a reset link if the account exists (always 200) |
 | POST | `/api/account/reset-password` | sets a new password (200) or 400 |
+| GET | `/api/features` | list of available features (200) |
 | GET | `/api/cars` | list of cars (200) |
 | GET | `/api/cars/{id}` | car details (200) or 404 |
 | POST | `/api/cars` | creates a car (201) or 400 |
 | PUT | `/api/cars/{id}` | updates a car (204), 400 or 404 |
+| PUT | `/api/cars/{id}/features` | replaces the car's features with `{ "featureIds": [...] }` (204) or 404; an empty list removes all |
 | DELETE | `/api/cars/{id}` | deletes a car (204), 403 for non-admins or 404 |
 
 All `/api/cars` endpoints return `401` without a valid JWT. Deleting a car additionally requires the `Admin` role (`[Authorize(Roles = "Admin")]`); a logged-in `User` gets `403 Forbidden`.
@@ -225,17 +227,18 @@ All `/cars` routes require a logged-in user.
 
 - **Account** – request without a token (401), wrong password (401), admin login (saves the JWT in `adminToken`) and forgot password with an unknown e-mail,
 - **Cars** – CRUD requests authorized with `adminToken`, including a validation error case,
+- **Features** – feature list (with and without a token), assigning features to a new car, clearing them and a non-existing car,
 - **Account - Email (manual)** – registration, e-mail confirmation, user login, delete as `User` (403) and password reset; needs SMTP and the `userId`, `confirmToken` and `resetToken` variables copied from the e-mails in Mailtrap.
 
 Import it into Postman or run the automated folders with the Postman CLI while the API is running:
 
 ```bash
-postman collection run "postman/Cars API.postman_collection.json" -i Account -i Cars
+postman collection run "postman/Cars API.postman_collection.json" -i Account -i Cars -i Features
 ```
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request to `main` and on every push to `main`:
 
-- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` with a random JWT key generated for the run, and runs the `Account` and `Cars` folders of the Postman collection with the Postman CLI. If a step fails, the API log is printed.
+- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` with a random JWT key generated for the run, and runs the `Account`, `Cars` and `Features` folders of the Postman collection with the Postman CLI. If a step fails, the API log is printed.
 - **frontend** – installs dependencies with `npm ci`, runs the linter (`oxlint`) and builds the app (TypeScript type check + Vite build).
