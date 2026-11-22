@@ -124,6 +124,7 @@ try
     var context = services.GetRequiredService<DataContext>();
     await context.Database.MigrateAsync();
     await Seed.SeedData(context);
+    await FeatureSeed.SeedAsync(context);
 
     var userManager = services.GetRequiredService<
         UserManager<AppUser>>();
