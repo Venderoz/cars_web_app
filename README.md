@@ -18,6 +18,8 @@ Relations in the data model:
 
 Feature seed data (8 items) is added on startup only when the `Features` table is empty.
 
+The API does not return EF Core entities. Car endpoints return `CarDto` (car fields plus `photos` – `CarPhotoDto(Id, Url, IsMain)` – and `features` – `FeatureDto(Id, Name)`), defined in `Cars.Application/Cars/DTOs`. `CarMapper` (`Cars.Application/Cars/Mappers`) holds the projection used by the list and details queries (`Select`, translated to SQL, no `Include`) and maps a created car to `CarDto`.
+
 Requests flow: `CarsController` → MediatR → `ValidationBehavior` → handler → `DataContext` → SQLite.
 Validation errors return `400 Bad Request`, unexpected errors return `500 Internal Server Error` (`ApiExceptionMiddleware`).
 

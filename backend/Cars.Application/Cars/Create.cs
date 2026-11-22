@@ -1,3 +1,5 @@
+using Cars.Application.Cars.DTOs;
+using Cars.Application.Cars.Mappers;
 using Cars.Domain;
 using Cars.Infrastructure;
 using FluentValidation;
@@ -7,12 +9,12 @@ namespace Cars.Application.Cars;
 
 public class Create
 {
-    public class Command : IRequest<Car>
+    public class Command : IRequest<CarDto>
     {
         public required Car Car { get; set; }
     }
 
-    public class Handler : IRequestHandler<Command, Car>
+    public class Handler : IRequestHandler<Command, CarDto>
     {
         private readonly DataContext _context;
 
@@ -21,12 +23,12 @@ public class Create
             _context = context;
         }
 
-        public async Task<Car> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<CarDto> Handle(Command request, CancellationToken cancellationToken)
         {
             _context.Cars.Add(request.Car);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return request.Car;
+            return CarMapper.ToDto(request.Car);
         }
     }
 
