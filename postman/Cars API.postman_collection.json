@@ -52,6 +52,22 @@
     {
       "key": "featureName2",
       "value": ""
+    },
+    {
+      "key": "photoCarId",
+      "value": ""
+    },
+    {
+      "key": "photoId",
+      "value": ""
+    },
+    {
+      "key": "secondPhotoId",
+      "value": ""
+    },
+    {
+      "key": "photoUrl",
+      "value": ""
     }
   ],
   "item": [
@@ -867,6 +883,516 @@
       ]
     },
     {
+      "name": "Photos",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "POST Create Car For Photos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"photoCarId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Peugeot\",\n  \"model\": \"308\",\n  \"doorsNumber\": 5,\n  \"luggageCapacity\": 412,\n  \"engineCapacity\": 1199,\n  \"fuelType\": 0,\n  \"productionDate\": \"2022-09-01T00:00:00Z\",\n  \"averageFuelConsumption\": 5.6,\n  \"bodyType\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Upload Photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", () => pm.response.to.have.status(201));",
+                  "const photo = pm.response.json();",
+                  "pm.test(\"First photo is main\", () => pm.expect(photo.isMain).to.be.true);",
+                  "pm.test(\"Url points to uploads\", () => pm.expect(photo.url).to.include(\"/uploads/cars/\"));",
+                  "pm.collectionVariables.set(\"photoId\", photo.id);",
+                  "pm.collectionVariables.set(\"photoUrl\", photo.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "test-files/car.png",
+                  "contentType": "image/png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Photo File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Served as an image\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"image/png\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{photoUrl}}",
+              "host": [
+                "{{photoUrl}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Upload Second Photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Second photo is not main\", () => pm.expect(pm.response.json().isMain).to.be.false);",
+                  "pm.collectionVariables.set(\"secondPhotoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "test-files/car.png",
+                  "contentType": "image/png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Car With Photos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+                  "const photos = pm.response.json().photos;",
+                  "pm.test(\"Car has two photos, main first\", () => {",
+                  "    pm.expect(photos).to.have.lengthOf(2);",
+                  "    pm.expect(photos[0].id).to.eql(pm.collectionVariables.get(\"photoId\"));",
+                  "    pm.expect(photos[0].isMain).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Upload Photo - Invalid Type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "test-files/not-an-image.txt",
+                  "contentType": "text/plain"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Upload Photo - Car Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "test-files/car.png",
+                  "contentType": "image/png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/00000000-0000-0000-0000-000000000001/photos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "00000000-0000-0000-0000-000000000001",
+                "photos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE Photo - No Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos/{{photoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos",
+                "{{photoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE Main Photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos/{{photoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos",
+                "{{photoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Car After Photo Delete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
+                  "const photos = pm.response.json().photos;",
+                  "pm.test(\"Remaining photo became main\", () => {",
+                  "    pm.expect(photos).to.have.lengthOf(1);",
+                  "    pm.expect(photos[0].id).to.eql(pm.collectionVariables.get(\"secondPhotoId\"));",
+                  "    pm.expect(photos[0].isMain).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Deleted Photo File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{photoUrl}}",
+              "host": [
+                "{{photoUrl}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE Photo - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos/{{photoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos",
+                "{{photoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE Second Photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos/{{secondPhotoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos",
+                "{{secondPhotoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE Car For Photos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Account - Email (manual)",
       "description": "Requires SMTP (Mailtrap Email Sandbox) configured in User Secrets. Run these requests one by one; copy userId and token from the e-mails in Mailtrap into the collection variables.",
       "item": [
@@ -1171,6 +1697,47 @@
                 "api",
                 "cars",
                 "{{carId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE Photo - User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{photoCarId}}/photos/{{photoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cars",
+                "{{photoCarId}}",
+                "photos",
+                "{{photoId}}"
               ]
             }
           }
