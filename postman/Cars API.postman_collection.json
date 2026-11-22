@@ -228,7 +228,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"Response is a list\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                  "pm.test(\"Response is a list\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"Cars include photos and features\", () => { const car = pm.response.json()[0]; pm.expect(car.photos).to.be.an(\"array\"); pm.expect(car.features).to.be.an(\"array\"); });"
                 ]
               }
             }
@@ -306,7 +307,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200 OK\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"Returns the created car\", () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"carId\")));"
+                  "pm.test(\"Returns the created car\", () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"carId\")));",
+                  "pm.test(\"Car details include photos and features\", () => { const car = pm.response.json(); pm.expect(car.photos).to.be.an(\"array\"); pm.expect(car.features).to.be.an(\"array\"); });"
                 ]
               }
             }
