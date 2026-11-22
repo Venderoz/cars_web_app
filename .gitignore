@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Uploaded car photos (keep the folder)
+backend/Cars.API/wwwroot/uploads/cars/*
+!backend/Cars.API/wwwroot/uploads/cars/.gitkeep
