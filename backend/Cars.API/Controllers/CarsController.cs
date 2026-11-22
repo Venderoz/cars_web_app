@@ -1,4 +1,5 @@
 using Cars.Application.Cars;
+using Cars.Application.Cars.DTOs;
 using Cars.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +18,13 @@ public class CarsController : BaseApiController
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Car>>> GetCars()
+    public async Task<ActionResult<List<CarDto>>> GetCars()
     {
         return await _sender.Send(new GetCarsList.Query());
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<Car>> GetCar(Guid id)
+    public async Task<ActionResult<CarDto>> GetCar(Guid id)
     {
         var car = await _sender.Send(new Details.Query { Id = id });
 
@@ -36,7 +37,7 @@ public class CarsController : BaseApiController
     }
 
     [HttpPost]
-    public async Task<ActionResult<Car>> CreateCar(Car car)
+    public async Task<ActionResult<CarDto>> CreateCar(Car car)
     {
         var result = await _sender.Send(new Create.Command { Car = car });
 
