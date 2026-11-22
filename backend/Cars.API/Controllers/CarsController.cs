@@ -64,6 +64,25 @@ public class CarsController : BaseApiController
         return NoContent();
     }
 
+    [Authorize]
+    [HttpPut("{id:guid}/features")]
+    public async Task<IActionResult> UpdateFeatures(Guid id, UpdateCarFeaturesDto dto)
+    {
+        var result = await _sender.Send(
+            new UpdateCarFeatures.Command
+            {
+                CarId = id,
+                FeatureIds = dto.FeatureIds,
+            });
+
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteCar(Guid id)
