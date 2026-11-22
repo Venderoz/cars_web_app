@@ -122,7 +122,11 @@ The `cars.db` database is created on startup (migrations + seed data with 12 sam
 | POST | `/api/cars` | creates a car (201) or 400 |
 | PUT | `/api/cars/{id}` | updates a car (204), 400 or 404 |
 | PUT | `/api/cars/{id}/features` | replaces the car's features with `{ "featureIds": [...] }` (204) or 404; an empty list removes all |
+| POST | `/api/cars/{id}/photos` | uploads a photo (`multipart/form-data`, field `file`; JPG, JPEG, PNG or WebP up to 5 MB); the first photo becomes main (201), 400 or 404 |
+| DELETE | `/api/cars/{id}/photos/{photoId}` | deletes a photo and its file, **Admin only** (204), 403 or 404; if the main photo is deleted, the oldest remaining photo becomes main |
 | DELETE | `/api/cars/{id}` | deletes a car (204), 403 for non-admins or 404 |
+
+Uploaded photos are saved in `Cars.API/wwwroot/uploads/cars` with a generated file name (the name sent by the client is never used on disk) and served as static files (`UseStaticFiles`), e.g. `http://localhost:5127/uploads/cars/<guid>.png`. The database stores only the photo metadata and URL. Uploaded files are ignored by git; the folder is kept with `.gitkeep`.
 
 All `/api/cars` endpoints return `401` without a valid JWT. Deleting a car additionally requires the `Admin` role (`[Authorize(Roles = "Admin")]`); a logged-in `User` gets `403 Forbidden`.
 
@@ -228,17 +232,18 @@ All `/cars` routes require a logged-in user.
 - **Account** – request without a token (401), wrong password (401), admin login (saves the JWT in `adminToken`) and forgot password with an unknown e-mail,
 - **Cars** – CRUD requests authorized with `adminToken`, including a validation error case,
 - **Features** – feature list (with and without a token), assigning features to a new car, clearing them and a non-existing car,
-- **Account - Email (manual)** – registration, e-mail confirmation, user login, delete as `User` (403) and password reset; needs SMTP and the `userId`, `confirmToken` and `resetToken` variables copied from the e-mails in Mailtrap.
+- **Photos** – upload (main photo, second photo), opening the returned URL, invalid file type, missing car, delete without a token, deleting the main photo (the second one becomes main, the file is removed) and cleanup; uses `postman/test-files`,
+- **Account - Email (manual)** – registration, e-mail confirmation, user login, deleting a car and a photo as `User` (403) and password reset; needs SMTP and the `userId`, `confirmToken` and `resetToken` variables copied from the e-mails in Mailtrap.
 
 Import it into Postman or run the automated folders with the Postman CLI while the API is running:
 
 ```bash
-postman collection run "postman/Cars API.postman_collection.json" -i Account -i Cars -i Features
+postman collection run "postman/Cars API.postman_collection.json" -i Account -i Cars -i Features -i Photos
 ```
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request to `main` and on every push to `main`:
 
-- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` with a random JWT key generated for the run, and runs the `Account`, `Cars` and `Features` folders of the Postman collection with the Postman CLI. If a step fails, the API log is printed.
+- **backend** – restores and builds the solution, starts `Cars.API` on `http://localhost:5127` with a random JWT key generated for the run, and runs the `Account`, `Cars`, `Features` and `Photos` folders of the Postman collection with the Postman CLI. If a step fails, the API log is printed.
 - **frontend** – installs dependencies with `npm ci`, runs the linter (`oxlint`) and builds the app (TypeScript type check + Vite build).
